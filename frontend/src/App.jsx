@@ -81,7 +81,7 @@ function App() {
   return (
     <div className="app">
       {showSettings ? (
-        <Settings onClose={handleSettingsClose} />
+        <Settings onClose={handleSettingsClose} user={user} />
       ) : !showForm ? (
         <SubscriptionsList
           subscriptions={subscriptions}

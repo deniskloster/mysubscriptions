@@ -36,6 +36,37 @@ class User {
       throw error;
     }
   }
+
+  static async updateSettings(telegramId, settings) {
+    try {
+      const { defaultCurrency, displayMode } = settings;
+      const result = await pool.query(
+        `UPDATE users
+         SET default_currency = COALESCE($1, default_currency),
+             display_mode = COALESCE($2, display_mode)
+         WHERE telegram_id = $3
+         RETURNING *`,
+        [defaultCurrency, displayMode, telegramId]
+      );
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error('Error updating user settings:', error);
+      throw error;
+    }
+  }
+
+  static async getSettings(telegramId) {
+    try {
+      const result = await pool.query(
+        'SELECT default_currency, display_mode FROM users WHERE telegram_id = $1',
+        [telegramId]
+      );
+      return result.rows[0] || { default_currency: 'RUB', display_mode: 'converted' };
+    } catch (error) {
+      console.error('Error getting user settings:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = User;

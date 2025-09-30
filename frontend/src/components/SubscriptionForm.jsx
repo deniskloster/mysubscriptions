@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { showBackButton, hideBackButton } from '../utils/telegram';
 import { createSubscription, updateSubscription, deleteSubscription } from '../api/subscriptions';
+import { getUserSettings } from '../api/users';
 import '../styles/SubscriptionForm.css';
 
 const PRESET_SERVICES = [
@@ -99,11 +100,25 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
         remindMe: subscription.remind_me,
         duration: subscription.duration
       });
+    } else {
+      // Загружаем дефолтную валюту пользователя для новой подписки
+      loadUserDefaultCurrency();
     }
-    // Убрали автоматический показ пресетов - теперь показываем форму
 
     return () => hideBackButton();
   }, [subscription]);
+
+  const loadUserDefaultCurrency = async () => {
+    try {
+      const settings = await getUserSettings(user.id);
+      setFormData(prev => ({
+        ...prev,
+        currency: settings.default_currency || 'RUB'
+      }));
+    } catch (error) {
+      console.error('Error loading user default currency:', error);
+    }
+  };
 
   const handlePresetSelect = (preset) => {
     setFormData({

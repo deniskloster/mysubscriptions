@@ -1,9 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SubscriptionCard from './SubscriptionCard';
+import { getUserSettings } from '../api/users';
 import '../styles/SubscriptionsList.css';
 
 function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSettingsClick }) {
   const [filter, setFilter] = useState('all');
+  const [userSettings, setUserSettings] = useState(null);
+
+  useEffect(() => {
+    loadUserSettings();
+  }, [user]);
+
+  const loadUserSettings = async () => {
+    try {
+      const settings = await getUserSettings(user.id);
+      setUserSettings(settings);
+    } catch (error) {
+      console.error('Error loading user settings:', error);
+      setUserSettings({ default_currency: 'RUB', display_mode: 'converted' });
+    }
+  };
 
   const calculateDaysUntil = (firstBill, cycle) => {
     if (!firstBill) return { days: 0, date: new Date() };
@@ -11,7 +27,6 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
     const billDate = new Date(firstBill);
     const today = new Date();
 
-    // Simple calculation - can be improved
     while (billDate < today) {
       if (cycle.includes('Month')) {
         const months = parseInt(cycle.match(/\d+/)[0]);
@@ -31,9 +46,11 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
     return { days: diffDays, date: billDate };
   };
 
-  const getTotalMonthly = () => {
-    return subscriptions.reduce((total, sub) => {
-      // Convert all to monthly estimate
+  const getTotalsByCurrency = () => {
+    const totals = {};
+
+    subscriptions.forEach(sub => {
+      const currency = sub.currency || 'RUB';
       let monthlyAmount = parseFloat(sub.price);
 
       if (sub.cycle.includes('Year')) {
@@ -46,15 +63,55 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
         monthlyAmount = monthlyAmount / 6;
       }
 
-      return total + monthlyAmount;
-    }, 0).toFixed(2);
+      totals[currency] = (totals[currency] || 0) + monthlyAmount;
+    });
+
+    Object.keys(totals).forEach(currency => {
+      totals[currency] = parseFloat(totals[currency].toFixed(2));
+    });
+
+    return totals;
   };
 
-  const getCurrencySymbol = () => {
-    if (subscriptions.length === 0) return '₽';
-    const currency = subscriptions[0].currency || 'RUB';
+  const getCurrencySymbol = (currency) => {
     const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
-    return symbols[currency] || '₽';
+    return symbols[currency] || currency;
+  };
+
+  const renderTotals = () => {
+    if (!userSettings) return null;
+
+    const totals = getTotalsByCurrency();
+    const displayMode = userSettings.display_mode || 'converted';
+
+    if (displayMode === 'separate') {
+      // Показываем все валюты отдельно
+      const currencies = Object.keys(totals);
+      if (currencies.length === 0) return <div className="total-amount">0 ₽</div>;
+
+      return (
+        <div className="total-amount-multi">
+          {currencies.map((currency, index) => (
+            <span key={currency} className="currency-total">
+              {getCurrencySymbol(currency)}{totals[currency]}
+              {index < currencies.length - 1 && <span className="separator"> / </span>}
+            </span>
+          ))}
+        </div>
+      );
+    } else {
+      // Конвертируем все в дефолтную валюту
+      // TODO: В будущем добавим реальную конвертацию через API
+      // Пока просто показываем сумму в основной валюте
+      const defaultCurrency = userSettings.default_currency || 'RUB';
+      const amount = totals[defaultCurrency] || 0;
+
+      return (
+        <div className="total-amount">
+          {getCurrencySymbol(defaultCurrency)}{amount.toFixed(2)}
+        </div>
+      );
+    }
   };
 
   return (
@@ -69,7 +126,7 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
         </div>
 
         <div className="total-section">
-          <div className="total-amount">{getCurrencySymbol()}{getTotalMonthly()}</div>
+          {renderTotals()}
           <div className="total-label">в месяц</div>
         </div>
       </header>

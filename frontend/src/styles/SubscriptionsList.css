@@ -41,11 +41,30 @@
   text-align: center;
 }
 
-.total-amount {
+.total-amount, .total-amount-multi {
   font-size: 48px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 5px;
+}
+
+.total-amount-multi {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.currency-total {
+  font-size: 36px;
+  white-space: nowrap;
+}
+
+.separator {
+  font-size: 28px;
+  color: var(--text-secondary);
+  margin: 0 4px;
 }
 
 .total-label {

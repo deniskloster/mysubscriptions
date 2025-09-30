@@ -15,6 +15,8 @@ async function initDatabase() {
         telegram_id BIGINT UNIQUE NOT NULL,
         username VARCHAR(255),
         first_name VARCHAR(255),
+        default_currency VARCHAR(10) DEFAULT 'RUB',
+        display_mode VARCHAR(20) DEFAULT 'converted',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);

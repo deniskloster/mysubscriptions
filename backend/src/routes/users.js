@@ -27,4 +27,29 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+// Get user settings
+router.get('/settings/:telegramId', async (req, res) => {
+  try {
+    const { telegramId } = req.params;
+    const settings = await User.getSettings(telegramId);
+    res.json(settings);
+  } catch (error) {
+    console.error('Error fetching user settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user settings
+router.put('/settings/:telegramId', async (req, res) => {
+  try {
+    const { telegramId } = req.params;
+    const settings = req.body;
+    const updatedUser = await User.updateSettings(telegramId, settings);
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Error updating user settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

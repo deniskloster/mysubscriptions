@@ -88,3 +88,80 @@
   color: var(--accent-color);
   font-weight: 600;
 }
+
+.currency-options, .display-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.currency-option, .display-mode-option {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 12px;
+  text-align: left;
+}
+
+.currency-option.active, .display-mode-option.active {
+  border-color: var(--accent-color);
+  background-color: var(--bg-accent);
+}
+
+.currency-option:active, .display-mode-option:active {
+  transform: scale(0.98);
+}
+
+.currency-symbol {
+  font-size: 28px;
+}
+
+.currency-label {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.display-mode-option {
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.display-mode-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.display-mode-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.display-mode-option .checkmark {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.settings-content .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
