@@ -187,7 +187,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Admin page
+// Admin page (HTML доступен всем, но API защищен IP + auth)
 app.get('/admin', (req, res) => {
   res.sendFile(__dirname + '/../public/admin.html');
 });
