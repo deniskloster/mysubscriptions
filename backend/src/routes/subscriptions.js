@@ -3,11 +3,18 @@ const router = express.Router();
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
 const { convertCurrency } = require('../services/currencyService');
+const { telegramAuthMiddleware } = require('../utils/telegramAuth');
 
 // Get all subscriptions for a user
-router.get('/:telegramId', async (req, res) => {
+router.get('/:telegramId', telegramAuthMiddleware, async (req, res) => {
   try {
     const { telegramId } = req.params;
+
+    // Check if authenticated user matches requested user
+    if (req.telegramUser.id !== parseInt(telegramId)) {
+      return res.status(403).json({ error: 'Forbidden: Cannot access other user data' });
+    }
+
     const user = await User.findByTelegramId(telegramId);
 
     if (!user) {
@@ -23,9 +30,14 @@ router.get('/:telegramId', async (req, res) => {
 });
 
 // Create new subscription
-router.post('/', async (req, res) => {
+router.post('/', telegramAuthMiddleware, async (req, res) => {
   try {
     const { telegramId, ...subscriptionData } = req.body;
+
+    // Check if authenticated user matches requested user
+    if (req.telegramUser.id !== parseInt(telegramId)) {
+      return res.status(403).json({ error: 'Forbidden: Cannot create subscription for other user' });
+    }
 
     let user = await User.findByTelegramId(telegramId);
     if (!user) {
@@ -45,10 +57,15 @@ router.post('/', async (req, res) => {
 });
 
 // Update subscription
-router.put('/:id', async (req, res) => {
+router.put('/:id', telegramAuthMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const { telegramId, ...updateData } = req.body;
+
+    // Check if authenticated user matches requested user
+    if (req.telegramUser.id !== parseInt(telegramId)) {
+      return res.status(403).json({ error: 'Forbidden: Cannot update subscription for other user' });
+    }
 
     const user = await User.findByTelegramId(telegramId);
     if (!user) {
@@ -69,10 +86,15 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete subscription
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', telegramAuthMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const { telegramId } = req.body;
+
+    // Check if authenticated user matches requested user
+    if (req.telegramUser.id !== parseInt(telegramId)) {
+      return res.status(403).json({ error: 'Forbidden: Cannot delete subscription for other user' });
+    }
 
     const user = await User.findByTelegramId(telegramId);
     if (!user) {
@@ -119,9 +141,15 @@ router.post('/convert-totals', async (req, res) => {
 });
 
 // Get deleted subscriptions count for this month
-router.get('/deleted-this-month/:telegramId', async (req, res) => {
+router.get('/deleted-this-month/:telegramId', telegramAuthMiddleware, async (req, res) => {
   try {
     const { telegramId } = req.params;
+
+    // Check if authenticated user matches requested user
+    if (req.telegramUser.id !== parseInt(telegramId)) {
+      return res.status(403).json({ error: 'Forbidden: Cannot access other user data' });
+    }
+
     const user = await User.findByTelegramId(telegramId);
 
     if (!user) {
