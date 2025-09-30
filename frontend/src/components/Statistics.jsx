@@ -1,24 +1,68 @@
 import { useState, useEffect } from 'react';
 import { showBackButton, hideBackButton } from '../utils/telegram';
-import { getDeletedThisMonth } from '../api/subscriptions';
+import { getDeletedThisMonth, convertTotals } from '../api/subscriptions';
+import { getUserSettings } from '../api/users';
 import '../styles/Statistics.css';
 
 function Statistics({ onClose, subscriptions, user }) {
   const [deletedCount, setDeletedCount] = useState(0);
+  const [mostExpensive, setMostExpensive] = useState(null);
+  const [userSettings, setUserSettings] = useState(null);
 
   useEffect(() => {
     showBackButton(onClose);
-    loadDeletedCount();
+    loadData();
     return () => hideBackButton();
   }, []);
 
-  const loadDeletedCount = async () => {
+  const loadData = async () => {
     try {
-      const result = await getDeletedThisMonth(user.id);
-      setDeletedCount(result.count);
+      const [deletedResult, settings] = await Promise.all([
+        getDeletedThisMonth(user.id),
+        getUserSettings(user.id)
+      ]);
+      setDeletedCount(deletedResult.count);
+      setUserSettings(settings);
+      await findMostExpensive(settings);
     } catch (error) {
-      console.error('Error loading deleted count:', error);
+      console.error('Error loading data:', error);
     }
+  };
+
+  const findMostExpensive = async (settings) => {
+    if (subscriptions.length === 0) return;
+
+    const targetCurrency = settings?.default_currency || 'RUB';
+    let maxConverted = 0;
+    let maxSub = null;
+
+    for (const sub of subscriptions) {
+      let monthlyAmount = parseFloat(sub.price);
+
+      // Приводим к месячной стоимости
+      if (sub.cycle.includes('Year')) {
+        monthlyAmount = monthlyAmount / 12;
+      } else if (sub.cycle.includes('Week')) {
+        monthlyAmount = monthlyAmount * 4;
+      } else if (sub.cycle.includes('3 Month')) {
+        monthlyAmount = monthlyAmount / 3;
+      } else if (sub.cycle.includes('6 Month')) {
+        monthlyAmount = monthlyAmount / 6;
+      }
+
+      // Конвертируем в целевую валюту
+      try {
+        const converted = await convertTotals({ [sub.currency]: monthlyAmount }, targetCurrency);
+        if (converted.total > maxConverted) {
+          maxConverted = converted.total;
+          maxSub = sub;
+        }
+      } catch (error) {
+        console.error('Error converting subscription:', error);
+      }
+    }
+
+    setMostExpensive(maxSub);
   };
 
   const getCurrencySymbol = (currency) => {
@@ -64,34 +108,6 @@ function Statistics({ onClose, subscriptions, user }) {
     return totals;
   };
 
-  const getMostExpensiveSubscription = () => {
-    if (subscriptions.length === 0) return null;
-
-    let maxMonthly = 0;
-    let mostExpensive = null;
-
-    subscriptions.forEach(sub => {
-      let monthlyAmount = parseFloat(sub.price);
-
-      if (sub.cycle.includes('Year')) {
-        monthlyAmount = monthlyAmount / 12;
-      } else if (sub.cycle.includes('Week')) {
-        monthlyAmount = monthlyAmount * 4;
-      } else if (sub.cycle.includes('3 Month')) {
-        monthlyAmount = monthlyAmount / 3;
-      } else if (sub.cycle.includes('6 Month')) {
-        monthlyAmount = monthlyAmount / 6;
-      }
-
-      if (monthlyAmount > maxMonthly) {
-        maxMonthly = monthlyAmount;
-        mostExpensive = sub;
-      }
-    });
-
-    return mostExpensive;
-  };
-
   const getNewSubscriptionsThisMonth = () => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -103,7 +119,6 @@ function Statistics({ onClose, subscriptions, user }) {
   };
 
   const totalSpent = calculateTotalSpent();
-  const mostExpensive = getMostExpensiveSubscription();
   const newThisMonth = getNewSubscriptionsThisMonth();
 
   return (

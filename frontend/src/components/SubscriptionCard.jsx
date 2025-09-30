@@ -2,13 +2,8 @@ import '../styles/SubscriptionCard.css';
 
 function SubscriptionCard({ subscription, daysUntil, onEdit }) {
   const getTimeDisplay = () => {
-    if (daysUntil <= 7) {
-      return `${daysUntil} ${daysUntil === 1 ? 'ДЕНЬ' : daysUntil < 5 ? 'ДНЯ' : 'ДНЕЙ'}`;
-    } else if (daysUntil <= 30) {
-      const weeks = Math.floor(daysUntil / 7);
-      return `${weeks} ${weeks === 1 ? 'НЕДЕЛЯ' : weeks < 5 ? 'НЕДЕЛИ' : 'НЕДЕЛЬ'}`;
-    }
-    return null;
+    if (daysUntil === 0) return null;
+    return `${daysUntil} ${daysUntil === 1 ? 'ДЕНЬ' : daysUntil < 5 ? 'ДНЯ' : 'ДНЕЙ'}`;
   };
 
   const getCurrencySymbol = (currency) => {
