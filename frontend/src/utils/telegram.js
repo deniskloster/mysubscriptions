@@ -7,7 +7,7 @@ export function initTelegramApp() {
 export function getTelegramUser() {
   const tg = window.Telegram.WebApp;
   return {
-    id: tg.initDataUnsafe?.user?.id || 123456789, // fallback for testing
+    id: tg.initDataUnsafe?.user?.id || 901611, // fallback to real user ID for development
     firstName: tg.initDataUnsafe?.user?.first_name || 'Test User',
     username: tg.initDataUnsafe?.user?.username || 'testuser'
   };
