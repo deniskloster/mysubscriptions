@@ -9,6 +9,7 @@ const { telegramAuthMiddleware } = require('../utils/telegramAuth');
 router.get('/:telegramId', telegramAuthMiddleware, async (req, res) => {
   try {
     const { telegramId } = req.params;
+    console.log('GET /api/subscriptions - telegramId:', telegramId);
 
     // Check if authenticated user matches requested user (TEMPORARILY DISABLED)
     if (req.telegramUser && req.telegramUser.id !== parseInt(telegramId)) {
@@ -16,6 +17,7 @@ router.get('/:telegramId', telegramAuthMiddleware, async (req, res) => {
     }
 
     const user = await User.findByTelegramId(telegramId);
+    console.log('User found:', user);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
