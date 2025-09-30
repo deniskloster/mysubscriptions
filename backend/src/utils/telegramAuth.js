@@ -80,7 +80,7 @@ function validateTelegramWebAppData(initData, botToken) {
 /**
  * Middleware to validate Telegram WebApp authentication
  */
-function telegramAuthMiddleware(req, res, next) {
+async function telegramAuthMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('tma ')) {
@@ -94,6 +94,17 @@ function telegramAuthMiddleware(req, res, next) {
 
   if (!user) {
     return res.status(401).json({ error: 'Unauthorized: Invalid Telegram auth data' });
+  }
+
+  // Update last_active timestamp
+  try {
+    const { pool } = require('../models/database');
+    await pool.query(
+      'UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE telegram_id = $1',
+      [user.id]
+    );
+  } catch (error) {
+    console.error('Error updating last_active:', error);
   }
 
   // Attach user to request

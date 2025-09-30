@@ -7,6 +7,7 @@ const cron = require('node-cron');
 
 const subscriptionsRouter = require('./routes/subscriptions');
 const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin');
 const { initDatabase } = require('./models/database');
 const { checkReminders } = require('./services/reminderService');
 const User = require('./models/User');
@@ -22,10 +23,12 @@ const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Routes
 app.use('/api/subscriptions', subscriptionsRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/admin', adminRouter);
 
 // Helper function to get currency symbol
 function getCurrencySymbol(currency) {
@@ -182,6 +185,11 @@ bot.on('message', async (msg) => {
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Admin page
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/../public/admin.html');
 });
 
 // Schedule reminder check every hour

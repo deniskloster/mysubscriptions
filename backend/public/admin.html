@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Мои Подписки</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f7fa;
+      color: #2d3748;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #1a202c;
+    }
+
+    .logout-btn {
+      background: #e53e3e;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .logout-btn:hover {
+      background: #c53030;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .stat-card .sub-value {
+      font-size: 14px;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    .section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #1a202c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px;
+      background: #f7fafc;
+      border-bottom: 2px solid #e2e8f0;
+      font-weight: 600;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    tr:hover {
+      background: #f7fafc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-rub {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+
+    .badge-usd {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .badge-eur {
+      background: #feebc8;
+      color: #7c2d12;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .btn-view {
+      background: #4299e1;
+      color: white;
+    }
+
+    .btn-delete {
+      background: #fc8181;
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    .login-form {
+      max-width: 400px;
+      margin: 100px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .login-form h2 {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #4299e1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background: #3182ce;
+    }
+
+    .error {
+      color: #e53e3e;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: #718096;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab.active {
+      color: #4299e1;
+      border-bottom-color: #4299e1;
+    }
+
+    .tab:hover {
+      color: #4299e1;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const API_URL = window.location.origin + '/api/admin';
+
+    function AdminPanel() {
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      const [credentials, setCredentials] = useState({ username: '', password: '' });
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [activeTab, setActiveTab] = useState('dashboard');
+
+      const [stats, setStats] = useState(null);
+      const [users, setUsers] = useState([]);
+      const [expensiveSubscriptions, setExpensiveSubscriptions] = useState([]);
+
+      useEffect(() => {
+        // Check if already authenticated
+        const savedCreds = localStorage.getItem('adminCreds');
+        if (savedCreds) {
+          const creds = JSON.parse(savedCreds);
+          setCredentials(creds);
+          setIsAuthenticated(true);
+          axios.defaults.headers.common['Authorization'] = 'Basic ' + btoa(creds.username + ':' + creds.password);
+          loadData();
+        }
+      }, []);
+
+      const login = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+          const auth = btoa(credentials.username + ':' + credentials.password);
+          axios.defaults.headers.common['Authorization'] = 'Basic ' + auth;
+
+          const response = await axios.get(API_URL + '/stats');
+
+          localStorage.setItem('adminCreds', JSON.stringify(credentials));
+          setIsAuthenticated(true);
+          setStats(response.data);
+          loadData();
+        } catch (err) {
+          setError(err.response?.data?.error || 'Ошибка авторизации');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const logout = () => {
+        localStorage.removeItem('adminCreds');
+        setIsAuthenticated(false);
+        setCredentials({ username: '', password: '' });
+        delete axios.defaults.headers.common['Authorization'];
+      };
+
+      const loadData = async () => {
+        try {
+          const [statsRes, usersRes, expensiveRes] = await Promise.all([
+            axios.get(API_URL + '/stats'),
+            axios.get(API_URL + '/users'),
+            axios.get(API_URL + '/expensive-subscriptions')
+          ]);
+
+          setStats(statsRes.data);
+          setUsers(usersRes.data);
+          setExpensiveSubscriptions(expensiveRes.data);
+        } catch (err) {
+          console.error('Error loading data:', err);
+        }
+      };
+
+      const deleteUser = async (id) => {
+        if (!confirm('Удалить пользователя?')) return;
+
+        try {
+          await axios.delete(API_URL + '/users/' + id);
+          loadData();
+        } catch (err) {
+          alert('Ошибка при удалении');
+        }
+      };
+
+      const formatDate = (date) => {
+        return new Date(date).toLocaleString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+
+      const getCurrencySymbol = (currency) => {
+        const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+        return symbols[currency] || currency;
+      };
+
+      if (!isAuthenticated) {
+        return (
+          <div className="login-form">
+            <h2>🔐 Admin Panel</h2>
+            <form onSubmit={login}>
+              <div className="form-group">
+                <label>Логин</label>
+                <input
+                  type="text"
+                  value={credentials.username}
+                  onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Пароль</label>
+                <input
+                  type="password"
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                  required
+                />
+              </div>
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? 'Вход...' : 'Войти'}
+              </button>
+              {error && <div className="error">{error}</div>}
+            </form>
+          </div>
+        );
+      }
+
+      if (!stats) {
+        return <div className="loading">Загрузка...</div>;
+      }
+
+      return (
+        <div className="container">
+          <div className="header">
+            <h1>📊 Admin Panel - Мои Подписки</h1>
+            <button className="logout-btn" onClick={logout}>Выйти</button>
+          </div>
+
+          <div className="tabs">
+            <button className={'tab ' + (activeTab === 'dashboard' ? 'active' : '')} onClick={() => setActiveTab('dashboard')}>
+              Дашборд
+            </button>
+            <button className={'tab ' + (activeTab === 'users' ? 'active' : '')} onClick={() => setActiveTab('users')}>
+              Пользователи
+            </button>
+            <button className={'tab ' + (activeTab === 'expensive' ? 'active' : '')} onClick={() => setActiveTab('expensive')}>
+              Дорогие подписки
+            </button>
+          </div>
+
+          {activeTab === 'dashboard' && (
+            <>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Всего пользователей</h3>
+                  <div className="value">{stats.totalUsers}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Новых сегодня</h3>
+                  <div className="value">{stats.newToday}</div>
+                  <div className="sub-value">Неделя: {stats.newThisWeek} | Месяц: {stats.newThisMonth}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Активных подписок</h3>
+                  <div className="value">{stats.totalSubscriptions}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Удалено за месяц</h3>
+                  <div className="value">{stats.deletedThisMonth}</div>
+                </div>
+              </div>
+
+              <div className="section">
+                <h2>Популярные валюты</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Валюта</th>
+                      <th>Пользователей</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.currencyUsage.map(item => (
+                      <tr key={item.default_currency}>
+                        <td>
+                          <span className={'badge badge-' + item.default_currency.toLowerCase()}>
+                            {item.default_currency}
+                          </span>
+                        </td>
+                        <td>{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="section">
+                <h2>Топ-10 популярных подписок</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Название</th>
+                      <th>Пользователей</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.popularSubscriptions.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.name}</td>
+                        <td>{item.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'users' && (
+            <div className="section">
+              <h2>Пользователи ({users.length})</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Имя</th>
+                    <th>Регистрация</th>
+                    <th>Последняя активность</th>
+                    <th>Подписок</th>
+                    <th>Траты/месяц</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(user => (
+                    <tr key={user.id}>
+                      <td>{user.telegram_id}</td>
+                      <td>@{user.username || '-'}</td>
+                      <td>{user.first_name}</td>
+                      <td>{formatDate(user.created_at)}</td>
+                      <td>{user.last_active ? formatDate(user.last_active) : '-'}</td>
+                      <td>{user.active_subscriptions}</td>
+                      <td>
+                        {Object.entries(user.monthly_spending).map(([currency, amount]) => (
+                          <div key={currency}>
+                            {getCurrencySymbol(currency)}{amount}
+                          </div>
+                        ))}
+                      </td>
+                      <td>
+                        <button className="btn btn-delete" onClick={() => deleteUser(user.id)}>
+                          Удалить
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === 'expensive' && (
+            <div className="section">
+              <h2>Топ-10 самых дорогих подписок</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Цикл</th>
+                    <th>Пользователь</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expensiveSubscriptions.map((sub, index) => (
+                    <tr key={index}>
+                      <td>{sub.name}</td>
+                      <td>{getCurrencySymbol(sub.currency)}{sub.price}</td>
+                      <td>{sub.cycle}</td>
+                      <td>@{sub.username || sub.telegram_id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<AdminPanel />, document.getElementById('root'));
+  </script>
+</body>
+</html>

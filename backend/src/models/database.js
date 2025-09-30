@@ -18,7 +18,8 @@ async function initDatabase() {
         default_currency VARCHAR(10) DEFAULT 'RUB',
         display_mode VARCHAR(20) DEFAULT 'converted',
         sort_mode VARCHAR(20) DEFAULT 'by_date',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
