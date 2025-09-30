@@ -21,11 +21,11 @@ services:
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
-      PORT: 3000
+      PORT: 3002
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mysubscriptions
       NODE_ENV: production
     ports:
-      - "3000:3000"
+      - "3002:3002"
     depends_on:
       - postgres
     networks:
@@ -36,7 +36,7 @@ services:
     build: ./frontend
     container_name: mysubscriptions-frontend
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3002/api}
     ports:
       - "5173:5173"
     networks:

@@ -3,12 +3,17 @@ import '../styles/SubscriptionCard.css';
 function SubscriptionCard({ subscription, daysUntil, onEdit }) {
   const getTimeDisplay = () => {
     if (daysUntil <= 7) {
-      return `${daysUntil} ${daysUntil === 1 ? 'DAY' : 'DAYS'}`;
+      return `${daysUntil} ${daysUntil === 1 ? 'ДЕНЬ' : daysUntil < 5 ? 'ДНЯ' : 'ДНЕЙ'}`;
     } else if (daysUntil <= 30) {
       const weeks = Math.floor(daysUntil / 7);
-      return `${weeks} ${weeks === 1 ? 'WEEK' : 'WEEKS'}`;
+      return `${weeks} ${weeks === 1 ? 'НЕДЕЛЯ' : weeks < 5 ? 'НЕДЕЛИ' : 'НЕДЕЛЬ'}`;
     }
     return null;
+  };
+
+  const getCurrencySymbol = (currency) => {
+    const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+    return symbols[currency] || currency;
   };
 
   const timeDisplay = getTimeDisplay();
@@ -27,7 +32,9 @@ function SubscriptionCard({ subscription, daysUntil, onEdit }) {
           <span className="card-name">{subscription.name}</span>
         </div>
         <div className="card-right">
-          <span className="card-price">${subscription.price}</span>
+          <span className="card-price">
+            {getCurrencySymbol(subscription.currency)}{subscription.price}
+          </span>
           {timeDisplay && (
             <span className="card-time">{timeDisplay}</span>
           )}

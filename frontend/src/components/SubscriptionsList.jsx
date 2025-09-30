@@ -2,10 +2,12 @@ import { useState } from 'react';
 import SubscriptionCard from './SubscriptionCard';
 import '../styles/SubscriptionsList.css';
 
-function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user }) {
+function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSettingsClick }) {
   const [filter, setFilter] = useState('all');
 
   const calculateDaysUntil = (firstBill, cycle) => {
+    if (!firstBill) return { days: 0, date: new Date() };
+
     const billDate = new Date(firstBill);
     const today = new Date();
 
@@ -17,6 +19,9 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user }) {
       } else if (cycle.includes('Week')) {
         const weeks = parseInt(cycle.match(/\d+/)[0]);
         billDate.setDate(billDate.getDate() + (weeks * 7));
+      } else if (cycle.includes('Year')) {
+        const years = parseInt(cycle.match(/\d+/)[0]);
+        billDate.setFullYear(billDate.getFullYear() + years);
       }
     }
 
@@ -35,27 +40,37 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user }) {
         monthlyAmount = monthlyAmount / 12;
       } else if (sub.cycle.includes('Week')) {
         monthlyAmount = monthlyAmount * 4;
+      } else if (sub.cycle.includes('3 Month')) {
+        monthlyAmount = monthlyAmount / 3;
+      } else if (sub.cycle.includes('6 Month')) {
+        monthlyAmount = monthlyAmount / 6;
       }
 
       return total + monthlyAmount;
     }, 0).toFixed(2);
   };
 
+  const getCurrencySymbol = () => {
+    if (subscriptions.length === 0) return '₽';
+    const currency = subscriptions[0].currency || 'RUB';
+    const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+    return symbols[currency] || '₽';
+  };
+
   return (
     <div className="subscriptions-list">
       <header className="list-header">
         <div className="header-top">
-          <button className="settings-btn">⚙️</button>
+          <button className="settings-btn" onClick={onSettingsClick}>⚙️</button>
           <div className="header-title">
-            <span className="dropdown-icon">▼</span>
-            <h1>All Subscriptions</h1>
+            <h1>Все подписки</h1>
           </div>
           <button className="add-btn" onClick={onAdd}>+</button>
         </div>
 
         <div className="total-section">
-          <div className="total-amount">${getTotalMonthly()}</div>
-          <div className="total-label">per month</div>
+          <div className="total-amount">{getCurrencySymbol()}{getTotalMonthly()}</div>
+          <div className="total-label">в месяц</div>
         </div>
       </header>
 

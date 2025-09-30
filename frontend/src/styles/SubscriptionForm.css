@@ -1,6 +1,6 @@
 .subscription-form {
   min-height: 100vh;
-  background-color: #000;
+  background-color: var(--bg-primary);
 }
 
 .form-header {
@@ -53,7 +53,7 @@
 }
 
 .form-fields {
-  background-color: #000;
+  background-color: var(--bg-primary);
   border-radius: 24px 24px 0 0;
   padding: 24px 20px;
   margin-top: -20px;
@@ -66,23 +66,24 @@
 .form-field label {
   display: block;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .form-field input,
 .form-field select {
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 14px 16px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
 .form-field input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-secondary);
+  opacity: 0.5;
 }
 
 .form-field select {
@@ -138,4 +139,90 @@
 .preset-price {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.icon-input-group,
+.color-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-input-group input {
+  flex: 1;
+}
+
+.emoji-picker-btn {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 20px;
+  cursor: pointer;
+  min-width: 56px;
+}
+
+.emoji-picker {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  padding: 16px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.emoji-option {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.emoji-option:hover {
+  background-color: var(--bg-accent);
+}
+
+.color-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.color-input-group input {
+  flex: 1;
+}
+
+.color-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+  padding: 16px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.color-option {
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-option:active {
+  transform: scale(0.9);
 }

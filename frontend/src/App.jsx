@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import SubscriptionsList from './components/SubscriptionsList';
 import SubscriptionForm from './components/SubscriptionForm';
+import Settings from './components/Settings';
 import { initTelegramApp, getTelegramUser } from './utils/telegram';
 import { getSubscriptions } from './api/subscriptions';
 import './styles/App.css';
@@ -8,6 +9,7 @@ import './styles/App.css';
 function App() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,10 @@ function App() {
 
     // Expand app to full height
     tg.expand();
+
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
 
     // Load subscriptions
     loadSubscriptions(telegramUser.id);
@@ -56,6 +62,14 @@ function App() {
     handleFormClose();
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+  };
+
+  const handleSettingsClose = () => {
+    setShowSettings(false);
+  };
+
   if (loading) {
     return (
       <div className="app loading">
@@ -66,12 +80,15 @@ function App() {
 
   return (
     <div className="app">
-      {!showForm ? (
+      {showSettings ? (
+        <Settings onClose={handleSettingsClose} />
+      ) : !showForm ? (
         <SubscriptionsList
           subscriptions={subscriptions}
           onAdd={handleAddClick}
           onEdit={handleEditClick}
           onRefresh={() => loadSubscriptions(user.id)}
+          onSettingsClick={handleSettingsClick}
           user={user}
         />
       ) : (

@@ -18,12 +18,15 @@ class Subscription {
     } = subscriptionData;
 
     try {
+      // Convert empty string to null for date field
+      const validFirstBill = firstBill && firstBill.trim() !== '' ? firstBill : null;
+
       const result = await pool.query(
         `INSERT INTO subscriptions
         (user_id, name, description, price, currency, icon, color, cycle, first_bill, remind_me, duration, category_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING *`,
-        [userId, name, description, price, currency, icon, color, cycle, firstBill, remindMe, duration, categoryId]
+        [userId, name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId]
       );
 
       return result.rows[0];
@@ -81,6 +84,9 @@ class Subscription {
     } = updateData;
 
     try {
+      // Convert empty string to null for date field
+      const validFirstBill = firstBill && firstBill.trim() !== '' ? firstBill : null;
+
       const result = await pool.query(
         `UPDATE subscriptions
         SET name = $1, description = $2, price = $3, currency = $4, icon = $5,
@@ -88,7 +94,7 @@ class Subscription {
             category_id = $11, updated_at = CURRENT_TIMESTAMP
         WHERE id = $12 AND user_id = $13
         RETURNING *`,
-        [name, description, price, currency, icon, color, cycle, firstBill, remindMe, duration, categoryId, id, userId]
+        [name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId, id, userId]
       );
 
       return result.rows[0] || null;

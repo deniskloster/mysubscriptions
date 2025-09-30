@@ -53,7 +53,7 @@ async function initDatabase() {
         icon VARCHAR(255),
         color VARCHAR(20) DEFAULT '#4A90E2',
         cycle VARCHAR(50) NOT NULL,
-        first_bill DATE NOT NULL,
+        first_bill DATE,
         remind_me VARCHAR(50) DEFAULT 'Never',
         duration VARCHAR(50) DEFAULT 'Forever',
         category_id INTEGER REFERENCES categories(id),
