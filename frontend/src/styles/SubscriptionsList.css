@@ -1,0 +1,88 @@
+.subscriptions-list {
+  min-height: 100vh;
+  background-color: #000;
+  padding-bottom: 20px;
+}
+
+.list-header {
+  padding: 20px;
+  background-color: #000;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.settings-btn, .add-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-icon {
+  font-size: 12px;
+  color: #666;
+}
+
+.header-title h1 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.total-section {
+  text-align: center;
+}
+
+.total-amount {
+  font-size: 48px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.total-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.subscriptions-container {
+  padding: 0 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.add-first-btn {
+  background-color: #4A90E2;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}

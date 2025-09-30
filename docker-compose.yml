@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mysubscriptions-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mysubscriptions
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mysubscriptions-network
+
+  backend:
+    build: ./backend
+    container_name: mysubscriptions-backend
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mysubscriptions
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - mysubscriptions-network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: mysubscriptions-frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    ports:
+      - "5173:5173"
+    networks:
+      - mysubscriptions-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  mysubscriptions-network:
+    driver: bridge
