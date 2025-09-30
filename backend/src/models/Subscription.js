@@ -109,7 +109,7 @@ class Subscription {
   static async delete(id, userId) {
     try {
       const result = await pool.query(
-        'UPDATE subscriptions SET is_active = false WHERE id = $1 AND user_id = $2 RETURNING *',
+        'UPDATE subscriptions SET is_active = false, deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND user_id = $2 RETURNING *',
         [id, userId]
       );
 
@@ -133,6 +133,25 @@ class Subscription {
       return result.rows;
     } catch (error) {
       console.error('Error getting due subscriptions:', error);
+      throw error;
+    }
+  }
+
+  static async getDeletedThisMonth(userId) {
+    try {
+      const result = await pool.query(
+        `SELECT COUNT(*) as count
+        FROM subscriptions
+        WHERE user_id = $1
+        AND is_active = false
+        AND deleted_at >= DATE_TRUNC('month', CURRENT_DATE)
+        AND deleted_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'`,
+        [userId]
+      );
+
+      return parseInt(result.rows[0].count) || 0;
+    } catch (error) {
+      console.error('Error getting deleted subscriptions count:', error);
       throw error;
     }
   }

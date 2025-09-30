@@ -17,6 +17,7 @@ async function initDatabase() {
         first_name VARCHAR(255),
         default_currency VARCHAR(10) DEFAULT 'RUB',
         display_mode VARCHAR(20) DEFAULT 'converted',
+        sort_mode VARCHAR(20) DEFAULT 'by_date',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -62,7 +63,8 @@ async function initDatabase() {
         category_id INTEGER REFERENCES categories(id),
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP
       );
     `);
 

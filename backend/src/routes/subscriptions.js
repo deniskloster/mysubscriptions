@@ -118,4 +118,22 @@ router.post('/convert-totals', async (req, res) => {
   }
 });
 
+// Get deleted subscriptions count for this month
+router.get('/deleted-this-month/:telegramId', async (req, res) => {
+  try {
+    const { telegramId } = req.params;
+    const user = await User.findByTelegramId(telegramId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const count = await Subscription.getDeletedThisMonth(user.id);
+    res.json({ count });
+  } catch (error) {
+    console.error('Error getting deleted count:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

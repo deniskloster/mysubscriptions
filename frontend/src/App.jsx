@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import SubscriptionsList from './components/SubscriptionsList';
 import SubscriptionForm from './components/SubscriptionForm';
 import Settings from './components/Settings';
+import Statistics from './components/Statistics';
 import { initTelegramApp, getTelegramUser } from './utils/telegram';
 import { getSubscriptions } from './api/subscriptions';
 import './styles/App.css';
@@ -10,6 +11,7 @@ function App() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showStatistics, setShowStatistics] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -70,6 +72,14 @@ function App() {
     setShowSettings(false);
   };
 
+  const handleStatisticsClick = () => {
+    setShowStatistics(true);
+  };
+
+  const handleStatisticsClose = () => {
+    setShowStatistics(false);
+  };
+
   if (loading) {
     return (
       <div className="app loading">
@@ -82,6 +92,8 @@ function App() {
     <div className="app">
       {showSettings ? (
         <Settings onClose={handleSettingsClose} user={user} />
+      ) : showStatistics ? (
+        <Statistics onClose={handleStatisticsClose} subscriptions={subscriptions} user={user} />
       ) : !showForm ? (
         <SubscriptionsList
           subscriptions={subscriptions}
@@ -89,6 +101,7 @@ function App() {
           onEdit={handleEditClick}
           onRefresh={() => loadSubscriptions(user.id)}
           onSettingsClick={handleSettingsClick}
+          onStatisticsClick={handleStatisticsClick}
           user={user}
         />
       ) : (

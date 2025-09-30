@@ -36,3 +36,8 @@ export async function convertTotals(totals, targetCurrency) {
   });
   return response.data;
 }
+
+export async function getDeletedThisMonth(telegramId) {
+  const response = await axios.get(`${API_URL}/subscriptions/deleted-this-month/${telegramId}`);
+  return response.data;
+}

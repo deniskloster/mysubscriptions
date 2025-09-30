@@ -16,13 +16,49 @@
   margin-bottom: 30px;
 }
 
-.settings-btn, .add-btn {
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-btn {
   background: none;
   border: none;
   color: var(--text-primary);
   font-size: 24px;
   cursor: pointer;
   padding: 8px;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.add-icon {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.add-text {
+  font-size: 14px;
 }
 
 .header-title {

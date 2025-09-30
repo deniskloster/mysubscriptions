@@ -39,14 +39,15 @@ class User {
 
   static async updateSettings(telegramId, settings) {
     try {
-      const { defaultCurrency, displayMode } = settings;
+      const { defaultCurrency, displayMode, sortMode } = settings;
       const result = await pool.query(
         `UPDATE users
          SET default_currency = COALESCE($1, default_currency),
-             display_mode = COALESCE($2, display_mode)
-         WHERE telegram_id = $3
+             display_mode = COALESCE($2, display_mode),
+             sort_mode = COALESCE($3, sort_mode)
+         WHERE telegram_id = $4
          RETURNING *`,
-        [defaultCurrency, displayMode, telegramId]
+        [defaultCurrency, displayMode, sortMode, telegramId]
       );
       return result.rows[0] || null;
     } catch (error) {
@@ -58,10 +59,10 @@ class User {
   static async getSettings(telegramId) {
     try {
       const result = await pool.query(
-        'SELECT default_currency, display_mode FROM users WHERE telegram_id = $1',
+        'SELECT default_currency, display_mode, sort_mode FROM users WHERE telegram_id = $1',
         [telegramId]
       );
-      return result.rows[0] || { default_currency: 'RUB', display_mode: 'converted' };
+      return result.rows[0] || { default_currency: 'RUB', display_mode: 'converted', sort_mode: 'by_date' };
     } catch (error) {
       console.error('Error getting user settings:', error);
       throw error;

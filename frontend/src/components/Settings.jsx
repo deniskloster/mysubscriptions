@@ -10,6 +10,7 @@ function Settings({ onClose, user }) {
 
   const [defaultCurrency, setDefaultCurrency] = useState('RUB');
   const [displayMode, setDisplayMode] = useState('converted');
+  const [sortMode, setSortMode] = useState('by_date');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ function Settings({ onClose, user }) {
       const settings = await getUserSettings(user.id);
       setDefaultCurrency(settings.default_currency || 'RUB');
       setDisplayMode(settings.display_mode || 'converted');
+      setSortMode(settings.sort_mode || 'by_date');
     } catch (error) {
       console.error('Error loading user settings:', error);
     } finally {
@@ -42,7 +44,8 @@ function Settings({ onClose, user }) {
     try {
       await updateUserSettings(user.id, {
         defaultCurrency: currency,
-        displayMode
+        displayMode,
+        sortMode
       });
     } catch (error) {
       console.error('Error updating currency:', error);
@@ -55,10 +58,25 @@ function Settings({ onClose, user }) {
     try {
       await updateUserSettings(user.id, {
         defaultCurrency,
-        displayMode: mode
+        displayMode: mode,
+        sortMode
       });
     } catch (error) {
       console.error('Error updating display mode:', error);
+      alert('Ошибка при сохранении настроек');
+    }
+  };
+
+  const handleSortModeChange = async (mode) => {
+    setSortMode(mode);
+    try {
+      await updateUserSettings(user.id, {
+        defaultCurrency,
+        displayMode,
+        sortMode: mode
+      });
+    } catch (error) {
+      console.error('Error updating sort mode:', error);
       alert('Ошибка при сохранении настроек');
     }
   };
@@ -161,6 +179,32 @@ function Settings({ onClose, user }) {
                 Отдельные суммы для каждой валюты
               </span>
               {displayMode === 'separate' && <span className="checkmark">✓</span>}
+            </button>
+          </div>
+        </div>
+
+        <div className="settings-section">
+          <h3>Сортировка на главной</h3>
+          <div className="display-mode-options">
+            <button
+              className={`display-mode-option ${sortMode === 'by_date' ? 'active' : ''}`}
+              onClick={() => handleSortModeChange('by_date')}
+            >
+              <span className="display-mode-label">По дате окончания</span>
+              <span className="display-mode-description">
+                Сначала ближайшие списания
+              </span>
+              {sortMode === 'by_date' && <span className="checkmark">✓</span>}
+            </button>
+            <button
+              className={`display-mode-option ${sortMode === 'alphabetical' ? 'active' : ''}`}
+              onClick={() => handleSortModeChange('alphabetical')}
+            >
+              <span className="display-mode-label">По алфавиту</span>
+              <span className="display-mode-description">
+                Сортировка от А до Я
+              </span>
+              {sortMode === 'alphabetical' && <span className="checkmark">✓</span>}
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { getUserSettings } from '../api/users';
 import { convertTotals } from '../api/subscriptions';
 import '../styles/SubscriptionsList.css';
 
-function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSettingsClick }) {
+function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSettingsClick, onStatisticsClick }) {
   const [filter, setFilter] = useState('all');
   const [userSettings, setUserSettings] = useState(null);
 
@@ -23,7 +23,7 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
   };
 
   const calculateDaysUntil = (firstBill, cycle) => {
-    if (!firstBill) return { days: 0, date: new Date() };
+    if (!firstBill) return { days: 999999, date: new Date() };
 
     const billDate = new Date(firstBill);
     const today = new Date();
@@ -45,6 +45,23 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return { days: diffDays, date: billDate };
+  };
+
+  const sortSubscriptions = (subs) => {
+    if (!userSettings) return subs;
+
+    const sortMode = userSettings.sort_mode || 'by_date';
+
+    if (sortMode === 'alphabetical') {
+      return [...subs].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+    } else {
+      // by_date - сортировка по ближайшему списанию
+      return [...subs].sort((a, b) => {
+        const daysA = calculateDaysUntil(a.first_bill, a.cycle).days;
+        const daysB = calculateDaysUntil(b.first_bill, b.cycle).days;
+        return daysA - daysB;
+      });
+    }
   };
 
   const getTotalsByCurrency = () => {
@@ -165,11 +182,17 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
     <div className="subscriptions-list">
       <header className="list-header">
         <div className="header-top">
-          <button className="settings-btn" onClick={onSettingsClick}>⚙️</button>
-          <div className="header-title">
-            <h1>Все подписки</h1>
+          <div className="header-left">
+            <button className="icon-btn" onClick={onSettingsClick}>⚙️</button>
+            <button className="icon-btn" onClick={onStatisticsClick}>📊</button>
           </div>
-          <button className="add-btn" onClick={onAdd}>+</button>
+          <div className="header-title">
+            <h1>У вас {subscriptions.length} {subscriptions.length === 1 ? 'подписка' : subscriptions.length < 5 ? 'подписки' : 'подписок'}</h1>
+          </div>
+          <button className="add-btn" onClick={onAdd}>
+            <span className="add-icon">+</span>
+            <span className="add-text">Добавить</span>
+          </button>
         </div>
 
         <div className="total-section">
@@ -187,13 +210,13 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
             </button>
           </div>
         ) : (
-          subscriptions.map(sub => {
+          sortSubscriptions(subscriptions).map(sub => {
             const timeInfo = calculateDaysUntil(sub.first_bill, sub.cycle);
             return (
               <SubscriptionCard
                 key={sub.id}
                 subscription={sub}
-                daysUntil={timeInfo.days}
+                daysUntil={timeInfo.days === 999999 ? 0 : timeInfo.days}
                 onEdit={() => onEdit(sub)}
               />
             );
