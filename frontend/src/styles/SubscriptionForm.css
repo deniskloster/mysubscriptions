@@ -11,13 +11,18 @@
   color: #fff;
 }
 
-.back-btn, .save-btn, .custom-btn {
+.back-btn, .save-btn, .custom-btn, .presets-link-btn {
   background: none;
   border: none;
   color: #fff;
   font-size: 18px;
   cursor: pointer;
   padding: 8px;
+}
+
+.presets-link-btn {
+  font-size: 16px;
+  text-decoration: underline;
 }
 
 .form-header h2 {
@@ -90,6 +95,19 @@
   cursor: pointer;
 }
 
+.save-btn-bottom {
+  width: 100%;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
 .delete-btn {
   width: 100%;
   background-color: rgba(255, 59, 48, 0.1);
@@ -100,7 +118,7 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .presets-grid {
@@ -204,13 +222,15 @@
 
 .color-picker {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
   margin-top: 12px;
   padding: 16px;
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .color-option {
