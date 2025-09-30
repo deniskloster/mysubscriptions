@@ -12,7 +12,7 @@ function SubscriptionCard({ subscription, daysUntil, onEdit }) {
   };
 
   const getCurrencySymbol = (currency) => {
-    const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+    const symbols = { 'RUB': '₽', 'USD': '💵', 'EUR': '💶' };
     return symbols[currency] || currency;
   };
 

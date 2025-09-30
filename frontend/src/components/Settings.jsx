@@ -124,7 +124,7 @@ function Settings({ onClose, user }) {
               className={`currency-option ${defaultCurrency === 'USD' ? 'active' : ''}`}
               onClick={() => handleCurrencyChange('USD')}
             >
-              <span className="currency-symbol">$</span>
+              <span className="currency-symbol">💵</span>
               <span className="currency-label">Доллары (USD)</span>
               {defaultCurrency === 'USD' && <span className="checkmark">✓</span>}
             </button>
@@ -132,7 +132,7 @@ function Settings({ onClose, user }) {
               className={`currency-option ${defaultCurrency === 'EUR' ? 'active' : ''}`}
               onClick={() => handleCurrencyChange('EUR')}
             >
-              <span className="currency-symbol">€</span>
+              <span className="currency-symbol">💶</span>
               <span className="currency-label">Евро (EUR)</span>
               {defaultCurrency === 'EUR' && <span className="checkmark">✓</span>}
             </button>

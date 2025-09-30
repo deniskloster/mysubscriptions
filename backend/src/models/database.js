@@ -58,6 +58,7 @@ async function initDatabase() {
         first_bill DATE,
         remind_me VARCHAR(50) DEFAULT 'Never',
         duration VARCHAR(50) DEFAULT 'Forever',
+        renewal_type VARCHAR(20) DEFAULT 'Автоматически',
         category_id INTEGER REFERENCES categories(id),
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

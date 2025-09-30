@@ -74,7 +74,7 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
   };
 
   const getCurrencySymbol = (currency) => {
-    const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+    const symbols = { 'RUB': '₽', 'USD': '💵', 'EUR': '💶' };
     return symbols[currency] || currency;
   };
 
@@ -101,14 +101,30 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
       );
     } else {
       // Конвертируем все в дефолтную валюту
-      // TODO: В будущем добавим реальную конвертацию через API
-      // Пока просто показываем сумму в основной валюте
-      const defaultCurrency = userSettings.default_currency || 'RUB';
-      const amount = totals[defaultCurrency] || 0;
+      // TODO: Реальная конвертация через API будет добавлена позже
+      // Пока показываем все валюты раздельно (как в режиме separate)
+      const currencies = Object.keys(totals);
+      if (currencies.length === 0) return <div className="total-amount">0 ₽</div>;
 
+      // Если все подписки в одной валюте, показываем просто сумму
+      if (currencies.length === 1) {
+        const currency = currencies[0];
+        return (
+          <div className="total-amount">
+            {getCurrencySymbol(currency)}{totals[currency].toFixed(2)}
+          </div>
+        );
+      }
+
+      // Если несколько валют, показываем все (временно, пока нет конвертации)
       return (
-        <div className="total-amount">
-          {getCurrencySymbol(defaultCurrency)}{amount.toFixed(2)}
+        <div className="total-amount-multi">
+          {currencies.map((currency, index) => (
+            <span key={currency} className="currency-total">
+              {getCurrencySymbol(currency)}{totals[currency]}
+              {index < currencies.length - 1 && <span className="separator"> / </span>}
+            </span>
+          ))}
         </div>
       );
     }

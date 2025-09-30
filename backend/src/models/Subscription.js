@@ -14,7 +14,8 @@ class Subscription {
       firstBill,
       remindMe,
       duration,
-      categoryId
+      categoryId,
+      renewalType
     } = subscriptionData;
 
     try {
@@ -23,10 +24,10 @@ class Subscription {
 
       const result = await pool.query(
         `INSERT INTO subscriptions
-        (user_id, name, description, price, currency, icon, color, cycle, first_bill, remind_me, duration, category_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        (user_id, name, description, price, currency, icon, color, cycle, first_bill, remind_me, duration, category_id, renewal_type)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         RETURNING *`,
-        [userId, name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId]
+        [userId, name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId, renewalType || 'Автоматически']
       );
 
       return result.rows[0];
@@ -80,7 +81,8 @@ class Subscription {
       firstBill,
       remindMe,
       duration,
-      categoryId
+      categoryId,
+      renewalType
     } = updateData;
 
     try {
@@ -91,10 +93,10 @@ class Subscription {
         `UPDATE subscriptions
         SET name = $1, description = $2, price = $3, currency = $4, icon = $5,
             color = $6, cycle = $7, first_bill = $8, remind_me = $9, duration = $10,
-            category_id = $11, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $12 AND user_id = $13
+            category_id = $11, renewal_type = $12, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $13 AND user_id = $14
         RETURNING *`,
-        [name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId, id, userId]
+        [name, description, price, currency, icon, color, cycle, validFirstBill, remindMe, duration, categoryId, renewalType || 'Автоматически', id, userId]
       );
 
       return result.rows[0] || null;

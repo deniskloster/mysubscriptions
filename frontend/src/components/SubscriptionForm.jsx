@@ -77,7 +77,8 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
     cycle: 'Every 1 Month(s)',
     firstBill: '',
     remindMe: 'Never',
-    duration: 'Forever'
+    duration: 'Forever',
+    renewalType: 'Автоматически'
   });
 
   const [showPresets, setShowPresets] = useState(false);
@@ -98,7 +99,8 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
         cycle: subscription.cycle,
         firstBill: subscription.first_bill?.split('T')[0] || '',
         remindMe: subscription.remind_me,
-        duration: subscription.duration
+        duration: subscription.duration,
+        renewalType: subscription.renewal_type || 'Автоматически'
       });
     } else {
       // Загружаем дефолтную валюту пользователя для новой подписки
@@ -147,7 +149,8 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
         firstBill: formData.firstBill,
         remindMe: formData.remindMe,
         duration: formData.duration,
-        categoryId: null
+        categoryId: null,
+        renewalType: formData.renewalType
       };
 
       if (subscription) {
@@ -176,7 +179,7 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
   };
 
   const getCurrencySymbol = (currency) => {
-    const symbols = { 'RUB': '₽', 'USD': '$', 'EUR': '€' };
+    const symbols = { 'RUB': '₽', 'USD': '💵', 'EUR': '💶' };
     return symbols[currency] || currency;
   };
 
@@ -394,6 +397,17 @@ function SubscriptionForm({ subscription, onSave, onClose, user }) {
             <option value="3 days before">За 3 дня</option>
             <option value="1 week before">За неделю</option>
             <option value="2 weeks before">За 2 недели</option>
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label>Продление</label>
+          <select
+            value={formData.renewalType}
+            onChange={(e) => setFormData({ ...formData, renewalType: e.target.value })}
+          >
+            <option value="Автоматически">Автоматически</option>
+            <option value="Самостоятельно">Самостоятельно</option>
           </select>
         </div>
 
