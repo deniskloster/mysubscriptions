@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import SubscriptionCard from './SubscriptionCard';
 import { getUserSettings } from '../api/users';
+import { convertTotals } from '../api/subscriptions';
 import '../styles/SubscriptionsList.css';
 
 function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSettingsClick }) {
@@ -78,6 +79,29 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
     return symbols[currency] || currency;
   };
 
+  const [convertedTotal, setConvertedTotal] = useState(null);
+
+  useEffect(() => {
+    if (userSettings && userSettings.display_mode === 'converted') {
+      convertTotalsToDefault();
+    }
+  }, [subscriptions, userSettings]);
+
+  const convertTotalsToDefault = async () => {
+    if (!userSettings) return;
+
+    const totals = getTotalsByCurrency();
+    const targetCurrency = userSettings.default_currency || 'RUB';
+
+    try {
+      const result = await convertTotals(totals, targetCurrency);
+      setConvertedTotal(result);
+    } catch (error) {
+      console.error('Error converting totals:', error);
+      setConvertedTotal(null);
+    }
+  };
+
   const renderTotals = () => {
     if (!userSettings) return null;
 
@@ -101,8 +125,6 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
       );
     } else {
       // Конвертируем все в дефолтную валюту
-      // TODO: Реальная конвертация через API будет добавлена позже
-      // Пока показываем все валюты раздельно (как в режиме separate)
       const currencies = Object.keys(totals);
       if (currencies.length === 0) return <div className="total-amount">0 ₽</div>;
 
@@ -116,7 +138,16 @@ function SubscriptionsList({ subscriptions, onAdd, onEdit, onRefresh, user, onSe
         );
       }
 
-      // Если несколько валют, показываем все (временно, пока нет конвертации)
+      // Если несколько валют, показываем конвертированную сумму
+      if (convertedTotal) {
+        return (
+          <div className="total-amount">
+            {getCurrencySymbol(convertedTotal.currency)}{convertedTotal.total}
+          </div>
+        );
+      }
+
+      // Пока грузится конвертация, показываем все валюты
       return (
         <div className="total-amount-multi">
           {currencies.map((currency, index) => (

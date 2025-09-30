@@ -28,3 +28,11 @@ export async function getCategories() {
   const response = await axios.get(`${API_URL}/users/categories`);
   return response.data;
 }
+
+export async function convertTotals(totals, targetCurrency) {
+  const response = await axios.post(`${API_URL}/subscriptions/convert-totals`, {
+    totals,
+    targetCurrency
+  });
+  return response.data;
+}

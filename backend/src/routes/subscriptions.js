@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
+const { convertCurrency } = require('../services/currencyService');
 
 // Get all subscriptions for a user
 router.get('/:telegramId', async (req, res) => {
@@ -87,6 +88,32 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Subscription deleted successfully' });
   } catch (error) {
     console.error('Error deleting subscription:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Convert totals to target currency
+router.post('/convert-totals', async (req, res) => {
+  try {
+    const { totals, targetCurrency } = req.body;
+
+    if (!totals || !targetCurrency) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    let convertedTotal = 0;
+
+    for (const [currency, amount] of Object.entries(totals)) {
+      const converted = await convertCurrency(parseFloat(amount), currency, targetCurrency);
+      convertedTotal += converted;
+    }
+
+    res.json({
+      total: parseFloat(convertedTotal.toFixed(2)),
+      currency: targetCurrency
+    });
+  } catch (error) {
+    console.error('Error converting totals:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
