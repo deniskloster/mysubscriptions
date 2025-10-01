@@ -26,35 +26,46 @@ function App() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Wait a bit for Telegram WebApp to initialize
-    const initTimer = setTimeout(() => {
+    // Try to get user with retries (Telegram data may load slowly)
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const tryGetUser = () => {
+      attempts++;
+      console.log(`Attempt ${attempts}/${maxAttempts} to get Telegram user...`);
+
       const telegramUser = getTelegramUser();
 
-      // Check if Telegram user data is available
-      if (!telegramUser) {
-        console.error('No Telegram user data available from Telegram WebApp');
-
-        // TEMPORARY: For Telegram Web which doesn't provide user data
-        // Try to get user from backend using Telegram's auth mechanism
-        if (window.Telegram?.WebApp?.platform === 'web' || window.Telegram?.WebApp?.version) {
-          console.warn('Telegram Web detected - user data not available. Please use Telegram Desktop or Mobile app for full functionality.');
-
-          // Show error message
-          setLoading(false);
-          alert('⚠️ Telegram Web не поддерживает Mini Apps полностью.\n\nПожалуйста, используйте:\n• Telegram Desktop (компьютер)\n• Telegram Mobile (iOS/Android)');
-          return;
-        }
-
-        setLoading(false);
+      if (telegramUser) {
+        console.log('✓ Telegram user loaded successfully:', telegramUser);
+        setUser(telegramUser);
+        loadSubscriptions(telegramUser.id);
         return;
       }
 
-      console.log('Telegram user loaded:', telegramUser);
-      setUser(telegramUser);
+      // Failed to get user
+      if (attempts >= maxAttempts) {
+        console.error('✗ Failed to get Telegram user after', maxAttempts, 'attempts');
 
-      // Load subscriptions
-      loadSubscriptions(telegramUser.id);
-    }, 100);
+        const platform = window.Telegram?.WebApp?.platform;
+        console.log('Platform:', platform);
+
+        if (platform === 'web' || platform === 'weba') {
+          setLoading(false);
+          alert('⚠️ Telegram Web не поддерживает Mini Apps.\n\nИспользуйте:\n• Telegram Desktop\n• Telegram Mobile');
+        } else {
+          setLoading(false);
+          alert('⚠️ Не удалось загрузить данные пользователя.\n\nПопробуйте:\n1. Перезапустить приложение\n2. Обновить Telegram\n3. Переустановить бот через /start');
+        }
+        return;
+      }
+
+      // Retry with exponential backoff
+      setTimeout(tryGetUser, attempts * 200);
+    };
+
+    // Start trying after 100ms
+    const initTimer = setTimeout(tryGetUser, 100);
 
     return () => clearTimeout(initTimer);
   }, []);
