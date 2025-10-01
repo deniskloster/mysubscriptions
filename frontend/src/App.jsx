@@ -19,6 +19,14 @@ function App() {
   useEffect(() => {
     const tg = initTelegramApp();
     const telegramUser = getTelegramUser();
+
+    // Check if Telegram user data is available
+    if (!telegramUser) {
+      setLoading(false);
+      alert('Это приложение можно открыть только через Telegram Mini App');
+      return;
+    }
+
     setUser(telegramUser);
 
     // Expand app to full height

@@ -6,10 +6,17 @@ export function initTelegramApp() {
 
 export function getTelegramUser() {
   const tg = window.Telegram.WebApp;
+
+  // Check if we have valid Telegram data
+  if (!tg.initDataUnsafe?.user?.id) {
+    console.error('No Telegram user data available. Please open this app from Telegram.');
+    return null;
+  }
+
   return {
-    id: tg.initDataUnsafe?.user?.id || 901611, // fallback to real user ID for development
-    firstName: tg.initDataUnsafe?.user?.first_name || 'Test User',
-    username: tg.initDataUnsafe?.user?.username || 'testuser'
+    id: tg.initDataUnsafe.user.id,
+    firstName: tg.initDataUnsafe.user.first_name || 'User',
+    username: tg.initDataUnsafe.user.username || ''
   };
 }
 
