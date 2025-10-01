@@ -12,22 +12,47 @@ export function getTelegramUser() {
     return null;
   }
 
-  console.log('Telegram WebApp initDataUnsafe:', tg.initDataUnsafe);
+  console.log('Telegram WebApp:', {
+    initDataUnsafe: tg.initDataUnsafe,
+    initData: tg.initData,
+    version: tg.version,
+    platform: tg.platform
+  });
 
-  // Check if we have valid Telegram data
-  if (!tg.initDataUnsafe?.user?.id) {
-    console.error('No Telegram user ID available');
-    return null;
+  // Try to get user from initDataUnsafe first
+  if (tg.initDataUnsafe?.user?.id) {
+    const user = {
+      id: tg.initDataUnsafe.user.id,
+      firstName: tg.initDataUnsafe.user.first_name || 'User',
+      username: tg.initDataUnsafe.user.username || ''
+    };
+    console.log('Telegram user extracted from initDataUnsafe:', user);
+    return user;
   }
 
-  const user = {
-    id: tg.initDataUnsafe.user.id,
-    firstName: tg.initDataUnsafe.user.first_name || 'User',
-    username: tg.initDataUnsafe.user.username || ''
-  };
+  // Fallback: try to parse from initData string
+  if (tg.initData) {
+    try {
+      const params = new URLSearchParams(tg.initData);
+      const userJson = params.get('user');
 
-  console.log('Telegram user extracted:', user);
-  return user;
+      if (userJson) {
+        const userData = JSON.parse(userJson);
+        const user = {
+          id: userData.id,
+          firstName: userData.first_name || 'User',
+          username: userData.username || ''
+        };
+        console.log('Telegram user extracted from initData:', user);
+        return user;
+      }
+    } catch (error) {
+      console.error('Error parsing initData:', error);
+    }
+  }
+
+  console.error('No Telegram user ID available from any source');
+  return null;
 }
 
 export function closeTelegramApp() {
