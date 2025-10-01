@@ -18,26 +18,33 @@ function App() {
 
   useEffect(() => {
     const tg = initTelegramApp();
-    const telegramUser = getTelegramUser();
 
-    // Check if Telegram user data is available
-    if (!telegramUser) {
-      setLoading(false);
-      alert('Это приложение можно открыть только через Telegram Mini App');
-      return;
-    }
-
-    setUser(telegramUser);
-
-    // Expand app to full height
+    // Expand app to full height immediately
     tg.expand();
 
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Load subscriptions
-    loadSubscriptions(telegramUser.id);
+    // Wait a bit for Telegram WebApp to initialize
+    const initTimer = setTimeout(() => {
+      const telegramUser = getTelegramUser();
+
+      // Check if Telegram user data is available
+      if (!telegramUser) {
+        setLoading(false);
+        console.error('No Telegram user data available');
+        return;
+      }
+
+      console.log('Telegram user loaded:', telegramUser);
+      setUser(telegramUser);
+
+      // Load subscriptions
+      loadSubscriptions(telegramUser.id);
+    }, 100);
+
+    return () => clearTimeout(initTimer);
   }, []);
 
   const loadSubscriptions = async (telegramId) => {

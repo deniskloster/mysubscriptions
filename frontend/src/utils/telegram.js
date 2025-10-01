@@ -5,19 +5,29 @@ export function initTelegramApp() {
 }
 
 export function getTelegramUser() {
-  const tg = window.Telegram.WebApp;
+  const tg = window.Telegram?.WebApp;
 
-  // Check if we have valid Telegram data
-  if (!tg.initDataUnsafe?.user?.id) {
-    console.error('No Telegram user data available. Please open this app from Telegram.');
+  if (!tg) {
+    console.error('Telegram WebApp not available');
     return null;
   }
 
-  return {
+  console.log('Telegram WebApp initDataUnsafe:', tg.initDataUnsafe);
+
+  // Check if we have valid Telegram data
+  if (!tg.initDataUnsafe?.user?.id) {
+    console.error('No Telegram user ID available');
+    return null;
+  }
+
+  const user = {
     id: tg.initDataUnsafe.user.id,
     firstName: tg.initDataUnsafe.user.first_name || 'User',
     username: tg.initDataUnsafe.user.username || ''
   };
+
+  console.log('Telegram user extracted:', user);
+  return user;
 }
 
 export function closeTelegramApp() {
