@@ -22,8 +22,24 @@ axios.interceptors.request.use((config) => {
 });
 
 export async function getSubscriptions(telegramId) {
-  const response = await axios.get(`${API_URL}/subscriptions/${telegramId}`);
-  return response.data;
+  console.log('getSubscriptions called with telegramId:', telegramId);
+  console.log('API_URL:', API_URL);
+
+  if (!telegramId) {
+    console.error('No telegramId provided to getSubscriptions');
+    return [];
+  }
+
+  try {
+    const url = `${API_URL}/subscriptions/${telegramId}`;
+    console.log('Fetching subscriptions from:', url);
+    const response = await axios.get(url);
+    console.log('Subscriptions response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subscriptions:', error);
+    throw error;
+  }
 }
 
 export async function createSubscription(data) {

@@ -48,9 +48,11 @@ function App() {
   }, []);
 
   const loadSubscriptions = async (telegramId) => {
+    console.log('loadSubscriptions called with telegramId:', telegramId);
     try {
       setLoading(true);
       const data = await getSubscriptions(telegramId);
+      console.log('Loaded subscriptions:', data);
       setSubscriptions(data);
     } catch (error) {
       console.error('Error loading subscriptions:', error);
