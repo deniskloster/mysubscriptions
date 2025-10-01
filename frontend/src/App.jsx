@@ -32,8 +32,20 @@ function App() {
 
       // Check if Telegram user data is available
       if (!telegramUser) {
+        console.error('No Telegram user data available from Telegram WebApp');
+
+        // TEMPORARY: For Telegram Web which doesn't provide user data
+        // Try to get user from backend using Telegram's auth mechanism
+        if (window.Telegram?.WebApp?.platform === 'web' || window.Telegram?.WebApp?.version) {
+          console.warn('Telegram Web detected - user data not available. Please use Telegram Desktop or Mobile app for full functionality.');
+
+          // Show error message
+          setLoading(false);
+          alert('⚠️ Telegram Web не поддерживает Mini Apps полностью.\n\nПожалуйста, используйте:\n• Telegram Desktop (компьютер)\n• Telegram Mobile (iOS/Android)');
+          return;
+        }
+
         setLoading(false);
-        console.error('No Telegram user data available');
         return;
       }
 
